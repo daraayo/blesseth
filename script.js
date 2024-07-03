@@ -56,6 +56,7 @@ function showLogin() {
 }
 
 function signup() {
+    console.log('Signup function called');
     const username = document.getElementById('signup-username').value;
     const password = document.getElementById('signup-password').value;
     
@@ -73,15 +74,20 @@ function signup() {
 
     users[username] = password;
     localStorage.setItem('users', JSON.stringify(users));
+    console.log('User signed up:', username);
+    console.log('Current users:', JSON.stringify(users));
     alert('Signup successful! Please login.');
     showLogin();
 }
 
 function login() {
+    console.log('Login function called');
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
     
     let users = JSON.parse(localStorage.getItem('users')) || {};
+    console.log('Attempting login for:', username);
+    console.log('Stored users:', JSON.stringify(users));
     
     if (users[username] === password) {
         currentUser = username;
@@ -89,12 +95,15 @@ function login() {
         document.getElementById('landing-page').style.display = 'block';
         document.getElementById('start-quiz-btn').style.display = 'block';
         updateDashboard();
+        console.log('Login successful');
     } else {
         alert('Invalid username or password');
+        console.log('Login failed');
     }
 }
 
 function logout() {
+    console.log('Logout function called');
     currentUser = null;
     userAnswers = Array(5).fill().map(() => Array(3).fill(null));
     currentSection = 0;
@@ -107,6 +116,7 @@ function logout() {
 }
 
 function updateDashboard() {
+    console.log('Updating dashboard');
     const userNameElement = document.getElementById('user-name');
     const loginLogoutBtn = document.getElementById('login-logout-btn');
     
@@ -191,6 +201,7 @@ function showResults() {
     document.getElementById('total-score').textContent = totalScore;
     displayAnalysis(totalScore);
     createChart();
+    displayDetailedSummary();
 }
 
 function calculateTotalScore() {
@@ -256,6 +267,47 @@ function createChart() {
     });
 }
 
+function displayDetailedSummary() {
+    let summaryHTML = '<h2>Detailed Summary</h2>';
+    
+    for (let i = 0; i < quizData.length; i++) {
+        summaryHTML += `<h3>${sectionTitles[i]}</h3>`;
+        summaryHTML += '<ul>';
+        
+        for (let j = 0; j < quizData[i].length; j++) {
+            summaryHTML += `<li>
+                <strong>Question:</strong> ${quizData[i][j].question}<br>
+                <strong>Your Answer:</strong> ${userAnswers[i][j] || 'Not answered'}
+            </li>`;
+        }
+        
+        summaryHTML += '</ul>';
+        
+        const sectionScore = userAnswers[i].reduce((sum, score) => sum + (score || 0), 0);
+        const maxSectionScore = quizData[i].length * 5;
+        const sectionPercentage = (sectionScore / maxSectionScore) * 100;
+        
+        summaryHTML += `<p><strong>Section Score:</strong> ${sectionScore} out of ${maxSectionScore} (${sectionPercentage.toFixed(2)}%)</p>`;
+        summaryHTML += getSectionAnalysis(sectionPercentage);
+    }
+    
+    document.getElementById('detailed-summary').innerHTML = summaryHTML;
+}
+
+function getSectionAnalysis(percentage) {
+    if (percentage >= 80) {
+        return "<p>You scored very high in this section, indicating a strong presence of this trait.</p>";
+    } else if (percentage >= 60) {
+        return "<p>You scored above average in this section, suggesting a notable presence of this trait.</p>";
+    } else if (percentage >= 40) {
+        return "<p>Your score in this section is average, indicating a balanced presence of this trait.</p>";
+    } else if (percentage >= 20) {
+        return "<p>You scored below average in this section, suggesting a lower presence of this trait.</p>";
+    } else {
+        return "<p>Your score in this section is low, indicating a minimal presence of this trait.</p>";
+    }
+}
+
 function restartQuiz() {
     currentSection = 0;
     currentQuestion = 0;
@@ -263,6 +315,12 @@ function restartQuiz() {
     document.getElementById('results-container').style.display = 'none';
     document.getElementById('quiz-container').style.display = 'block';
     loadQuestion();
+}
+
+// Function to clear localStorage for testing purposes
+function clearLocalStorage() {
+    localStorage.clear();
+    console.log('localStorage cleared');
 }
 
 // Event Listeners
@@ -284,6 +342,14 @@ document.getElementById('share-btn').addEventListener('click', () => {
     // Implement sharing functionality (e.g., copy results to clipboard or open a share dialog)
     alert('Share functionality to be implemented');
 });
+document.getElementById('login-logout-btn').addEventListener('click', function() {
+    if (currentUser) {
+        logout();
+    } else {
+        showAuthContainer();
+    }
+});
+document.getElementById('clear-storage-btn').addEventListener('click', clearLocalStorage);
 
 // Initialize the page
 updateDashboard();
