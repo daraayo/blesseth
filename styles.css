@@ -1,20 +1,35 @@
 body {
     font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
+    padding: 0;
     background-color: #f0f0f0;
 }
 
-#auth-container, #quiz-container, #results-container {
-    background-color: white;
+#dashboard {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#user-info {
+    display: flex;
+    align-items: center;
+}
+
+#user-name {
+    margin-right: 20px;
+}
+
+#landing-page, #auth-container, #quiz-container, #results-container {
+    max-width: 800px;
+    margin: 20px auto;
     padding: 20px;
+    background-color: white;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    max-width: 600px;
-    width: 100%;
 }
 
 #progress-bar {
