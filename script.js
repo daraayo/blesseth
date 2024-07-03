@@ -86,9 +86,9 @@ function login() {
     if (users[username] === password) {
         currentUser = username;
         document.getElementById('auth-container').style.display = 'none';
-        document.getElementById('quiz-container').style.display = 'block';
-        alert(`Welcome, ${username}! You are now entering Section 1: ${sectionTitles[0]}`);
-        loadQuestion();
+        document.getElementById('landing-page').style.display = 'block';
+        document.getElementById('start-quiz-btn').style.display = 'block';
+        updateDashboard();
     } else {
         alert('Invalid username or password');
     }
@@ -101,8 +101,36 @@ function logout() {
     currentQuestion = 0;
     document.getElementById('results-container').style.display = 'none';
     document.getElementById('quiz-container').style.display = 'none';
+    document.getElementById('landing-page').style.display = 'block';
+    document.getElementById('start-quiz-btn').style.display = 'none';
+    updateDashboard();
+}
+
+function updateDashboard() {
+    const userNameElement = document.getElementById('user-name');
+    const loginLogoutBtn = document.getElementById('login-logout-btn');
+    
+    if (currentUser) {
+        userNameElement.textContent = `Welcome, ${currentUser}!`;
+        loginLogoutBtn.textContent = 'Logout';
+        loginLogoutBtn.onclick = logout;
+    } else {
+        userNameElement.textContent = '';
+        loginLogoutBtn.textContent = 'Login';
+        loginLogoutBtn.onclick = showAuthContainer;
+    }
+}
+
+function showAuthContainer() {
+    document.getElementById('landing-page').style.display = 'none';
     document.getElementById('auth-container').style.display = 'block';
     showLogin();
+}
+
+function startQuiz() {
+    document.getElementById('landing-page').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+    loadQuestion();
 }
 
 // Quiz functions
@@ -200,7 +228,7 @@ document.getElementById('show-signup').addEventListener('click', showSignup);
 document.getElementById('show-login').addEventListener('click', showLogin);
 document.getElementById('signup-btn').addEventListener('click', signup);
 document.getElementById('login-btn').addEventListener('click', login);
-document.getElementById('logout-btn').addEventListener('click', logout);
+document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
 document.getElementById('prev-btn').addEventListener('click', moveToPreviousQuestion);
 document.getElementById('next-btn').addEventListener('click', () => {
     const selectedAnswer = document.querySelector('input[name="answer"]:checked');
@@ -212,4 +240,4 @@ document.getElementById('next-btn').addEventListener('click', () => {
 document.getElementById('restart-btn').addEventListener('click', restartQuiz);
 
 // Initialize the page
-showLogin();
+updateDashboard();
