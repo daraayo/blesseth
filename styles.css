@@ -12,6 +12,7 @@ body {
     border: none;
     border-radius: 15px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
 .btn-primary {
@@ -97,4 +98,30 @@ body {
     background-color: #f8f9fa;
     border-radius: 10px;
     padding: 20px;
+}
+
+#detailed-summary h3 {
+    margin-top: 20px;
+    color: #4e54c8;
+}
+
+#detailed-summary ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#detailed-summary li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+#detailed-summary strong {
+    color: #4e54c8;
+}
+
+#radar-chart {
+    max-width: 500px;
+    margin: 0 auto;
 }
