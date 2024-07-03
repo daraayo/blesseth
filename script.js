@@ -138,23 +138,25 @@ function loadQuestion() {
     const questionData = quizData[currentSection][currentQuestion];
     document.getElementById('section-title').textContent = `Section ${currentSection + 1}: ${sectionTitles[currentSection]}`;
     document.getElementById('question-container').innerHTML = `
-        <h2>${questionData.question}</h2>
+        <h3 class="mb-4">${questionData.question}</h3>
         <div class="options">
             ${[1, 2, 3, 4, 5].map(option => `
                 <label>
                     <input type="radio" name="answer" value="${option}" ${userAnswers[currentSection][currentQuestion] === option ? 'checked' : ''}>
-                    ${option}
+                    <span>${option}</span>
+                    ${option === 1 ? 'Strongly Disagree' : option === 5 ? 'Strongly Agree' : ''}
                 </label>
             `).join('')}
         </div>
-        <p class="scale-description">1 = Strongly Disagree, 5 = Strongly Agree</p>
     `;
     updateProgressBar();
 }
 
 function updateProgressBar() {
     const progress = ((currentSection * 3 + currentQuestion + 1) / (quizData.length * 3)) * 100;
-    document.getElementById('progress').style.width = `${progress}%`;
+    const progressBar = document.getElementById('progress');
+    progressBar.style.width = `${progress}%`;
+    progressBar.setAttribute('aria-valuenow', progress);
 }
 
 function moveToNextQuestion() {
@@ -188,6 +190,7 @@ function showResults() {
     const totalScore = calculateTotalScore();
     document.getElementById('total-score').textContent = totalScore;
     displayAnalysis(totalScore);
+    createChart();
 }
 
 function calculateTotalScore() {
@@ -214,6 +217,45 @@ function displayAnalysis(totalScore) {
     document.getElementById('analysis').innerHTML = `<p>${analysis}</p>`;
 }
 
+function createChart() {
+    const ctx = document.createElement('canvas');
+    document.getElementById('analysis').appendChild(ctx);
+
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: sectionTitles,
+            datasets: [{
+                label: 'Your Personality Profile',
+                data: userAnswers.map(section => section.reduce((sum, score) => sum + score, 0)),
+                fill: true,
+                backgroundColor: 'rgba(78, 84, 200, 0.2)',
+                borderColor: 'rgb(78, 84, 200)',
+                pointBackgroundColor: 'rgb(78, 84, 200)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(78, 84, 200)'
+            }]
+        },
+        options: {
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: {
+                        display: false
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 15
+                }
+            }
+        }
+    });
+}
+
 function restartQuiz() {
     currentSection = 0;
     currentQuestion = 0;
@@ -238,6 +280,10 @@ document.getElementById('next-btn').addEventListener('click', () => {
     moveToNextQuestion();
 });
 document.getElementById('restart-btn').addEventListener('click', restartQuiz);
+document.getElementById('share-btn').addEventListener('click', () => {
+    // Implement sharing functionality (e.g., copy results to clipboard or open a share dialog)
+    alert('Share functionality to be implemented');
+});
 
 // Initialize the page
 updateDashboard();
