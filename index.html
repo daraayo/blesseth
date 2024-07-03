@@ -7,7 +7,29 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="auth-container">
+    <header id="dashboard">
+        <h1>Personality Quiz</h1>
+        <div id="user-info">
+            <span id="user-name"></span>
+            <button id="login-logout-btn">Login</button>
+        </div>
+    </header>
+
+    <div id="landing-page">
+        <h2>Welcome to the Personality Assessment Quiz</h2>
+        <p>This quiz will help you understand your personality traits across five dimensions:</p>
+        <ul>
+            <li>Extraversion</li>
+            <li>Conscientiousness</li>
+            <li>Agreeableness</li>
+            <li>Neuroticism</li>
+            <li>Openness to Experience</li>
+        </ul>
+        <p>The quiz consists of 15 questions, divided into 5 sections. Each question is rated on a scale of 1 (Strongly Disagree) to 5 (Strongly Agree).</p>
+        <button id="start-quiz-btn" style="display: none;">Start Quiz</button>
+    </div>
+
+    <div id="auth-container" style="display: none;">
         <div id="login-form">
             <h2>Login</h2>
             <input type="text" id="login-username" placeholder="Username">
@@ -23,6 +45,7 @@
             <p>Already have an account? <a href="#" id="show-login">Login</a></p>
         </div>
     </div>
+
     <div id="quiz-container" style="display: none;">
         <h1 id="section-title">Section 1</h1>
         <div id="progress-bar">
@@ -36,13 +59,14 @@
             <button id="next-btn">Next</button>
         </div>
     </div>
+
     <div id="results-container" style="display: none;">
         <h2>Assessment Results</h2>
         <p>Your total score: <span id="total-score"></span></p>
         <div id="analysis"></div>
         <button id="restart-btn">Restart Quiz</button>
-        <button id="logout-btn">Logout</button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
