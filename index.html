@@ -87,14 +87,18 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h3 class="card-title">Total Score: <span id="total-score"></span></h3>
-                    <div id="analysis" class="mt-4"></div>
-                    <canvas id="radar-chart" class="mt-4"></canvas>
+                
                 </div>
             </div>
             <div class="card">
                 <div class="card-body">
                     <div id="detailed-summary"></div>
                 </div>
+                <div id="analysis" class="mt-4"></div>
+                <div class="chart-container">
+                    <canvas id="analysis-chart"></canvas>
+                </div>
+                
             </div>
             <div class="text-center mt-4">
                 <button id="restart-btn" class="btn btn-primary me-2">Restart Quiz</button>
@@ -103,10 +107,46 @@
         </div>
     </div>
 
+    <!-- Section Change Modal -->
+    <div class="modal fade" id="sectionChangeModal" tabindex="-1" aria-labelledby="sectionChangeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sectionChangeModalLabel">New Section</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="sectionChangeMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertModalLabel">Notice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <button id="clear-storage-btn" style="position: fixed; bottom: 10px; right: 10px;">Clear Storage</button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
