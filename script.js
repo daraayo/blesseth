@@ -44,6 +44,19 @@ let currentQuestion = 0;
 let userAnswers = Array(5).fill().map(() => Array(3).fill(null));
 let currentUser = null;
 
+// Modal handling functions
+function showSectionChangeModal(message) {
+    document.getElementById('sectionChangeMessage').textContent = message;
+    var modal = new bootstrap.Modal(document.getElementById('sectionChangeModal'));
+    modal.show();
+}
+
+function showAlertModal(message) {
+    document.getElementById('alertMessage').textContent = message;
+    var modal = new bootstrap.Modal(document.getElementById('alertModal'));
+    modal.show();
+}
+
 // Authentication functions
 function showSignup() {
     document.getElementById('login-form').style.display = 'none';
@@ -61,14 +74,14 @@ function signup() {
     const password = document.getElementById('signup-password').value;
     
     if (!username || !password) {
-        alert('Please enter both username and password');
+        showAlertModal('Please enter both username and password');
         return;
     }
 
     let users = JSON.parse(localStorage.getItem('users')) || {};
     
     if (users[username]) {
-        alert('Username already exists');
+        showAlertModal('Username already exists');
         return;
     }
 
@@ -76,7 +89,7 @@ function signup() {
     localStorage.setItem('users', JSON.stringify(users));
     console.log('User signed up:', username);
     console.log('Current users:', JSON.stringify(users));
-    alert('Signup successful! Please login.');
+    showAlertModal('Signup successful! Please login.');
     showLogin();
 }
 
@@ -97,7 +110,7 @@ function login() {
         updateDashboard();
         console.log('Login successful');
     } else {
-        alert('Invalid username or password');
+        showAlertModal('Invalid username or password');
         console.log('Login failed');
     }
 }
@@ -175,7 +188,7 @@ function moveToNextQuestion() {
     } else if (currentSection < quizData.length - 1) {
         currentSection++;
         currentQuestion = 0;
-        alert(`You are now entering Section ${currentSection + 1}: ${sectionTitles[currentSection]}`);
+        showSectionChangeModal(`You are now entering Section ${currentSection + 1}: ${sectionTitles[currentSection]}`);
     } else {
         showResults();
         return;
@@ -189,7 +202,7 @@ function moveToPreviousQuestion() {
     } else if (currentSection > 0) {
         currentSection--;
         currentQuestion = 2;
-        alert(`You are now entering Section ${currentSection + 1}: ${sectionTitles[currentSection]}`);
+        showSectionChangeModal(`You are now entering Section ${currentSection + 1}: ${sectionTitles[currentSection]}`);
     }
     loadQuestion();
 }
@@ -229,43 +242,102 @@ function displayAnalysis(totalScore) {
 }
 
 function createChart() {
-    const ctx = document.createElement('canvas');
-    document.getElementById('analysis').appendChild(ctx);
+    const ctx = document.getElementById('analysis-chart').getContext('2d');
+
+    const sectionScores = userAnswers.map(section => 
+        section.reduce((sum, score) => sum + (score || 0), 0)
+    );
 
     new Chart(ctx, {
-        type: 'radar',
+        type: 'bar',
         data: {
             labels: sectionTitles,
             datasets: [{
                 label: 'Your Personality Profile',
-                data: userAnswers.map(section => section.reduce((sum, score) => sum + score, 0)),
-                fill: true,
-                backgroundColor: 'rgba(78, 84, 200, 0.2)',
-                borderColor: 'rgb(78, 84, 200)',
-                pointBackgroundColor: 'rgb(78, 84, 200)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(78, 84, 200)'
+                data: sectionScores,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 2
             }]
         },
         options: {
-            elements: {
-                line: {
-                    borderWidth: 3
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 15,
+                    title: {
+                        display: true,
+                        text: 'Score',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Personality Traits',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 14
+                        }
+                    }
                 }
             },
-            scales: {
-                r: {
-                    angleLines: {
-                        display: false
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y + ' / 15';
+                            }
+                            return label;
+                        }
                     },
-                    suggestedMin: 0,
-                    suggestedMax: 15
+                    titleFont: {
+                        size: 16
+                    },
+                    bodyFont: {
+                        size: 14
+                    }
                 }
             }
         }
     });
 }
+
 
 function displayDetailedSummary() {
     let summaryHTML = '<h2>Detailed Summary</h2>';
@@ -274,37 +346,53 @@ function displayDetailedSummary() {
         summaryHTML += `<h3>${sectionTitles[i]}</h3>`;
         summaryHTML += '<ul>';
         
+        let sectionScore = 0;
         for (let j = 0; j < quizData[i].length; j++) {
+            const answer = userAnswers[i][j];
+            sectionScore += answer || 0;
             summaryHTML += `<li>
                 <strong>Question:</strong> ${quizData[i][j].question}<br>
-                <strong>Your Answer:</strong> ${userAnswers[i][j] || 'Not answered'}
+                <strong>Your Answer:</strong> ${answer ? answer : 'Not answered'}
+                ${answer ? `(${getAnswerDescription(answer)})` : ''}
             </li>`;
         }
         
         summaryHTML += '</ul>';
         
-        const sectionScore = userAnswers[i].reduce((sum, score) => sum + (score || 0), 0);
         const maxSectionScore = quizData[i].length * 5;
         const sectionPercentage = (sectionScore / maxSectionScore) * 100;
         
         summaryHTML += `<p><strong>Section Score:</strong> ${sectionScore} out of ${maxSectionScore} (${sectionPercentage.toFixed(2)}%)</p>`;
-        summaryHTML += getSectionAnalysis(sectionPercentage);
+        summaryHTML += `<p><strong>Section Summary:</strong> ${getSectionSummary(i, sectionPercentage)}</p>`;
+        summaryHTML += '<hr>';
     }
     
     document.getElementById('detailed-summary').innerHTML = summaryHTML;
 }
 
-function getSectionAnalysis(percentage) {
+function getAnswerDescription(answer) {
+    switch(answer) {
+        case 1: return 'Strongly Disagree';
+        case 2: return 'Disagree';
+        case 3: return 'Neutral';
+        case 4: return 'Agree';
+        case 5: return 'Strongly Agree';
+        default: return '';
+    }
+}
+
+function getSectionSummary(sectionIndex, percentage) {
+    const trait = sectionTitles[sectionIndex];
     if (percentage >= 80) {
-        return "<p>You scored very high in this section, indicating a strong presence of this trait.</p>";
+        return `You scored very high in ${trait}, indicating a strong presence of this trait in your personality.`;
     } else if (percentage >= 60) {
-        return "<p>You scored above average in this section, suggesting a notable presence of this trait.</p>";
+        return `You scored above average in ${trait}, suggesting a notable presence of this trait in your personality.`;
     } else if (percentage >= 40) {
-        return "<p>Your score in this section is average, indicating a balanced presence of this trait.</p>";
+        return `Your score in ${trait} is average, indicating a balanced presence of this trait in your personality.`;
     } else if (percentage >= 20) {
-        return "<p>You scored below average in this section, suggesting a lower presence of this trait.</p>";
+        return `You scored below average in ${trait}, suggesting a lower presence of this trait in your personality.`;
     } else {
-        return "<p>Your score in this section is low, indicating a minimal presence of this trait.</p>";
+        return `Your score in ${trait} is low, indicating a minimal presence of this trait in your personality.`;
     }
 }
 
@@ -321,7 +409,10 @@ function restartQuiz() {
 function clearLocalStorage() {
     localStorage.clear();
     console.log('localStorage cleared');
+    showAlertModal('Local storage has been cleared.');
 }
+
+
 
 // Event Listeners
 document.getElementById('show-signup').addEventListener('click', showSignup);
@@ -340,7 +431,7 @@ document.getElementById('next-btn').addEventListener('click', () => {
 document.getElementById('restart-btn').addEventListener('click', restartQuiz);
 document.getElementById('share-btn').addEventListener('click', () => {
     // Implement sharing functionality (e.g., copy results to clipboard or open a share dialog)
-    alert('Share functionality to be implemented');
+    showAlertModal('Share functionality to be implemented');
 });
 document.getElementById('login-logout-btn').addEventListener('click', function() {
     if (currentUser) {
